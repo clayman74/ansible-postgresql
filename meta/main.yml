@@ -1,0 +1,15 @@
+galaxy_info:
+  author: Kirill Sumorokov
+  description: Configure Postgresql database server.
+
+  license: MIT
+
+  min_ansible_version: 2.7
+
+  platforms:
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+
+  galaxy_tags: ['postgresql']

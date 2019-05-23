@@ -1,0 +1,19 @@
+---
+
+- import_tasks: install.yml
+  when: ansible_distribution == 'Debian'
+  tags:
+    - postgresql
+
+- import_tasks: users.yml
+  tags:
+    - postgresql
+
+- import_tasks: databases.yml
+  tags:
+    - postgresql
+
+- import_tasks: exporter.yml
+  when: postgresql.exporter.enabled|default(False)
+  tags:
+    - postgresql

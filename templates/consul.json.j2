@@ -1,0 +1,47 @@
+{
+  "services": [
+    {
+      "name": "{{ postgresql.service.name }}",
+{% if postgresql.service.tags %}
+      "tags": ["{{ postgresql.service.tags|join('", "') }}"],
+{% endif %}
+{% if postgresql.service.meta %}
+      "meta": {
+{% for key, value in postgresql.service.meta.items() %}
+        "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+      },
+{% endif %}
+      "address": "{{ postgresql.server.host }}",
+      "port": {{ postgresql.server.port }}
+    }{% if postgresql.exporter.enabled %},{% endif %}
+
+{% if postgresql.exporter.enabled %}
+    {
+      "name": "{{ postgresql.exporter.service.name }}",
+{% if postgresql.exporter.service.tags %}
+      "tags": ["{{ postgresql.exporter.service.tags|join('", "') }}"],
+{% endif %}
+{% if postgresql.exporter.service.meta %}
+      "meta": {
+{% for key, value in postgresql.exporter.service.meta.items() %}
+        "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+
+{% endfor %}
+      },
+{% endif %}
+      "address": "{{ postgresql.exporter.host }}",
+      "port": {{ postgresql.exporter.port }},
+      "checks": [
+        {
+          "id": "postgresql_exporter_check",
+          "name": "Postgresql prometheus exporter health check",
+          "http": "http://{{ postgresql.exporter.host }}:{{ postgresql.exporter.port }}",
+          "interval": "20s"
+        }
+      ]
+    }
+{% endif %}
+  ]
+}

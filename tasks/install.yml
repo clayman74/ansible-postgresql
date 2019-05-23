@@ -1,0 +1,41 @@
+---
+
+- name: Add repo key
+  apt_key:
+    url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+    state: present
+
+- name: Add repo
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+    state: present
+
+- name: Add sources repo
+  apt_repository:
+    repo: "deb-src http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+    state: present
+
+- name: Install postgresql from repo
+  apt:
+    name:
+      - "postgresql-{{ postgresql.version }}"
+      - "postgresql-common"
+      - "postgresql-server-dev-{{ postgresql.version }}"
+      - "postgresql-contrib-{{ postgresql.version }}"
+      - "python-psycopg2"
+    update_cache: yes
+
+- name: Install postgis from repo
+  apt:
+    name:
+      - "postgresql-{{ postgresql.version }}-postgis-{{ postgresql.postgis.version }}"
+      - "postgresql-{{ postgresql.version }}-postgis-{{ postgresql.postgis.version }}-scripts"
+      - "postgis"
+  when: postgresql.postgis.enabled
+
+- name: Assemble configs
+  template: src="{{ item }}.j2" dest="/etc/postgresql/{{ postgresql.version }}/main/{{ item }}"
+  with_items:
+    - postgresql.conf
+    - pg_hba.conf
+  notify: restart postgresql server

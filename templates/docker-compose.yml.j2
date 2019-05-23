@@ -1,0 +1,23 @@
+---
+
+version: '3.5'
+
+services:
+  exporter:
+    container_name: {{ postgresql.exporter.container.name }}
+    image: {{ postgresql.exporter.container.image }}
+    dns: {{ postgresql.exporter.container.dns }}
+    environment:
+      DATA_SOURCE_URI: {{ postgresql.server.host }}:{{ postgresql.server.port }}/postgres?sslmode=disable
+      PG_EXPORTER_EXTEND_QUERY_PATH: /opt/services/postgresql/queries.yaml
+    env_file: .env
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "unixgram:///dev/log"
+        tag: postgresql_exporter
+    ports:
+      - "{{ postgresql.exporter.host }}:{{ postgresql.exporter.port }}:9187"
+    restart: {{ postgresql.exporter.container.restart }}
+    volumes:
+      - ./queries.yaml:/opt/services/postgresql/queries.yaml
