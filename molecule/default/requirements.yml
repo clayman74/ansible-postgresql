@@ -1,0 +1,9 @@
+---
+
+  - src: git+https://github.com/clayman74/ansible-docker
+    version: 1.2.0
+    name: docker
+
+  - src: git+https://github.com/clayman74/ansible-dnsmasq
+    version: v1.0.0
+    name: dnsmasq
