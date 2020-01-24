@@ -7,7 +7,7 @@
 - name: Restart postgresql service
   command: docker-compose up -d
   args:
-    chdir: "{{ consul_dir }}"
+    chdir: "{{ postgresql.service_dir }}"
   listen: restart postgresql service
 
 - name: Update consul config  # noqa 305

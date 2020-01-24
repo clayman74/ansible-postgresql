@@ -1,0 +1,12 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+ansible = "==2.9.2"
+docker = "==4.1.0"
+molecule = "==2.22"
+
+[requires]
+python_version = "3.8"

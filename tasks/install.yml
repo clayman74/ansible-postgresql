@@ -1,5 +1,10 @@
 ---
 
+- name: Install required packages
+  apt:
+    name:
+      - "gpg"
+
 - name: Add repo key
   apt_key:
     url: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
@@ -39,3 +44,6 @@
     - postgresql.conf
     - pg_hba.conf
   notify: restart postgresql server
+
+- name: Restart server
+  systemd: name=postgresql state=restarted

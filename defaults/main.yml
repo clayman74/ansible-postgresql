@@ -53,6 +53,8 @@ postgresql:
       user: backups
       password: backups
 
+  service_dir: "{{ services_dir }}/postgresql"
+
   exporter:
     enabled: yes
 

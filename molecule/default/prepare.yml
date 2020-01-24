@@ -1,0 +1,53 @@
+---
+
+- name: Prepare
+  hosts: all
+  become: true
+
+  vars:
+    env: develop
+
+    services_dir: /opt/services
+
+    private_network: "{{ ansible_eth0['ipv4'] }}"
+
+  roles:
+    - role: docker
+
+  tasks:
+    - name: Set storage-driver to vfs via daemon.json
+      copy:
+        content: |
+          {
+            "storage-driver": "vfs"
+          }
+        dest: /etc/docker/daemon.json
+
+    - name: Restart docker
+      systemd: state=restarted name=docker
+
+    - name: Install required packages
+      apt: name=locales
+
+    - name: Install locales
+      locale_gen:
+        name: "{{ item }}"
+      with_items:
+        - en_US.UTF-8
+        - ru_RU.UTF-8
+
+    - name: Generate locales
+      debconf:
+        name: locales
+        question: locales/locales_to_be_generated
+        value: en_US.UTF-8 UTF-8, ru_RU.UTF-8 UTF-8
+        vtype: multiselect
+      become: true
+
+    - name: Set default locale to ru_RU.UTF-8
+      debconf:
+        name: locales
+        question: locales/default_environment_locale
+        value: ru_RU.UTF-8
+        vtype: select
+      become: true

@@ -1,0 +1,89 @@
+---
+
+- name: Converge
+  hosts: all
+  become: true
+
+  vars:
+    env: develop
+
+    services_dir: /opt/services
+
+    private_network: "{{ ansible_eth0['ipv4'] }}"
+
+    postgresql:
+      version: 11
+
+      postgis:
+        enabled: no
+        version: 2.5
+
+      config:
+        max_connections: '20'
+        superuser_reserved_connections: '3'
+        shared_buffers: '128MB'
+
+        work_mem: '16MB'
+        maintenance_work_mem: '64MB'
+        effective_cache_size: '64MB'
+
+        autovacuum: on
+        autovacuum_max_workers: 1
+
+        log_min_duration_statement: 1000
+        logging_collector: 'off'
+
+      allowed_networks:
+        - 172.0.0.0/8  # Docker network
+        - "{{ private_network['network'] }}/24"  # Private cluster network
+
+      server:
+        host: "{{ private_network.address }}"
+        port: 5432
+
+      service:
+        discovery: "{{ env }}.postgresql.service.consul"
+
+      databases:
+        passport:
+          name: passport
+          owner: passport
+
+      extensions: {}
+
+      users:
+        prometheus:
+          user: prometheus
+          password: prometheus
+        backups:
+          user: backups
+          password: backups
+        passport:
+          user: passport
+          password: passport
+
+      service_dir: "{{ services_dir }}/postgresql"
+
+      exporter:
+        enabled: yes
+
+        host: "{{ private_network.address }}"
+        port: 9187
+
+        container:
+          image: wrouesnel/postgres_exporter
+          name: postgresql_exporter
+          dns: "{{ private_network.address }}"
+          restart: always
+
+        schema: prometheus
+        user: prometheus
+        password: prometheus
+
+
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+
+  tasks:
+    - name: Install test requirements
+      apt: name=curl
