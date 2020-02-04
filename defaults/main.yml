@@ -30,17 +30,7 @@ postgresql:
     host: "{{ private_network.address }}"
     port: 5432
 
-  service:
-    dir: "{{ services_dir }}/postgresql"
-
-    discovery: "{{ env }}.postgresql.service.consul"
-
-    name: postgresql
-    tags:
-      - "{{ env }}"
-    meta:
-      hostname: "{{ ansible_hostname }}"
-      tier: "{{ env }}"
+  service_dir: "{{ services_dir }}/postgresql"
 
   databases: {}
   extensions: {}
@@ -52,8 +42,6 @@ postgresql:
     backups:
       user: backups
       password: backups
-
-  service_dir: "{{ services_dir }}/postgresql"
 
   exporter:
     enabled: yes
@@ -70,11 +58,3 @@ postgresql:
     schema: prometheus
     user: prometheus
     password: prometheus
-
-    service:
-      name: postgresql-exporter
-      tags:
-        - "{{ env }}"
-      meta:
-        hostname: "{{ ansible_hostname }}"
-        tier: "{{ env }}"
